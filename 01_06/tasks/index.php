@@ -1,5 +1,10 @@
 <?php
 
+//regulate input with allow list to prevent sql inject
+$allowed = array("0","1");
+if (isset($_GET['completed']) && in_array($_GET['completed'], $allowed)){
+  $completed = $_GET['completed'];
+}
 // 1. Create a database connection
 $db = mysqli_connect("127.0.0.1", "mariadb", "mariadb", "mariadb", 3306);
 
@@ -12,7 +17,11 @@ if(mysqli_connect_errno()) {
 }
 
 // 2. Perform database query
-$sql = "SELECT * FROM tasks ORDER BY priority";
+$sql = "SELECT * FROM tasks ";
+if (isset($completed)) {
+  $sql .= "WHERE completed = {$completed} ";
+}
+$sql .= "ORDER BY priority";
 $result = mysqli_query($db, $sql);
 
 // Test if query succeeded (recommended)
