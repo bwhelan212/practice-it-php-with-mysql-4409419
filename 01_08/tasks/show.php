@@ -1,5 +1,9 @@
 <?php
 
+// check if id is set and typecast to prevent sql injection
+// id numbers normally not 0 so we make that the option if there is none present
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+
 // 1. Create a database connection
 $db = mysqli_connect("127.0.0.1", "mariadb", "mariadb", "mariadb", 3306);
 
@@ -12,7 +16,10 @@ if(mysqli_connect_errno()) {
 }
 
 // 2. Perform database query
-$sql = "SELECT * FROM tasks LIMIT 1";
+$sql = "SELECT * FROM tasks ";
+$sql .= "WHERE id = {$id} ";
+//expecting only one record back
+$sql .= "LIMIT 1";
 $result = mysqli_query($db, $sql);
 
 // Test if query succeeded (recommended)
@@ -20,9 +27,13 @@ if (!$result) {
 	exit("Database query failed.");
 }
 
-// 3. Use returned data (if any)
+// 3. Use returned data (if any) 
 $task = mysqli_fetch_assoc($result);
 
+// checking if any records returned
+if (is_null($task)) {
+  exit("No task found.");
+}
 ?>
 
 <!doctype html>
